@@ -2,8 +2,8 @@
     <div class="products">
         <div class="product" v-for="product in products" :key="product.id">
             <h3>{{ product.name }}</h3>
-            <p>${{ product.price }}</p>
-            <!-- <p>{{ formattedPrice }}</p> -->
+            <p>${{ (product.price / usd).toFixed(2) }}</p>
+            <!-- <p>${{ formattedPrice }}</p> -->
             <p>
                 {{ product.available ? "Available" : "Out of stock" }}
             </p>
@@ -43,21 +43,30 @@ export default {
                     available: true
                 },
             ],
+            usd: 0,
         };
     },
   
+    mounted() {
+        fetch('https://www.cbr-xml-daily.ru/daily_json.js')
+            .then(data => data.json())
+            .then(responce => {
+                this.usd = responce.Valute.USD.Value;
+            })
+        },
+
+    methods: {
+        
+    },
+
     // НЕ РАБОТАЕТ!
     computed: {
-        formattedPrice() {
-            const formatter = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            });
-            return formatter.format(this.product.price);
+        formattedPrice: function() {
+            const formatter = (this.price / this.usd).toFixed(2);
+            return formatter;
         },
     },
 }
-
 
 </script>
     
